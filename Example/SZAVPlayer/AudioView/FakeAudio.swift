@@ -28,7 +28,7 @@ class FakeAudio: NSObject {
         let audio = FakeAudio()
         audio.cover = "http://p2.music.126.net/nEtbaHINgXyGz3mLOELUhg==/6637751697108298.jpg?param=400y400"
         audio.title = "Where'd You Go"
-        audio.url = "http://music.163.com/song/media/outer/url?id=1345171.mp3"
+        audio.url = "https://download.samplelib.com/mp3/sample-9s.mp3"
 
         return audio
     }
@@ -37,7 +37,7 @@ class FakeAudio: NSObject {
         let audio = FakeAudio()
         audio.cover = "http://p2.music.126.net/-2sXMGhK4vw6KlzhW_YayQ==/109951163780662542.jpg?param=400y400"
         audio.title = "Do It"
-        audio.url = "http://music.163.com/song/media/outer/url?id=27845048.mp3"
+        audio.url = "https://download.samplelib.com/mp3/sample-9s.mp3"
 
         return audio
     }
@@ -46,7 +46,7 @@ class FakeAudio: NSObject {
         let audio = FakeAudio()
         audio.cover = "http://p2.music.126.net/FGhXCsQCEZOjTRc8K8XsYQ==/109951164461390248.jpg?param=400y400"
         audio.title = "Love poem"
-        audio.url = "http://music.163.com/song/media/outer/url?id=1400436688.mp3"
+        audio.url = "https://download.samplelib.com/mp3/sample-9s.mp3"
 
         return audio
     }

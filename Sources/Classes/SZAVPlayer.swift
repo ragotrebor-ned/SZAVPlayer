@@ -166,24 +166,33 @@ extension SZAVPlayer {
     public func setupPlayer(config: SZAVPlayerConfig) {
         guard let url = URL(string: config.urlStr) else { return }
 
-        if let _ = player, let oldAssetLoader = assetLoader {
-            oldAssetLoader.cleanup()
-            self.assetLoader = nil
-        }
+        if config.useAssetLoader {
+            if let _ = player, let oldAssetLoader = assetLoader {
+                oldAssetLoader.cleanup()
+                self.assetLoader = nil
+            }
 
-        self.config = config
-        isReadyToPlay = false
-        currentURLStr = config.urlStr
-        let assetLoader = createAssetLoader(url: url, uniqueID: config.uniqueID, config: config)
-        assetLoader.loadAsset(disableCustomLoading: config.disableCustomLoading) { (asset) in
+            self.config = config
+            isReadyToPlay = false
+            currentURLStr = config.urlStr
+            let assetLoader = createAssetLoader(url: url, uniqueID: config.uniqueID, config: config)
+            assetLoader.loadAsset(disableCustomLoading: config.disableCustomLoading) { (asset) in
+                if let _ = self.player {
+                    self.replacePlayerItem(asset: asset)
+                } else {
+                    self.createPlayer(asset: asset)
+                }
+            }
+
+            self.assetLoader = assetLoader
+        } else {
             if let _ = self.player {
-                self.replacePalyerItem(asset: asset)
+                self.replacePlayerItem(url: url)
             } else {
-                self.createPlayer(asset: asset)
+                self.createPlayer(url: url)
             }
         }
-
-        self.assetLoader = assetLoader
+        
     }
 
     /// Replace playerItem with new urlStr and uniqueID.
@@ -303,7 +312,7 @@ extension SZAVPlayer {
 
     // MARK: Private
 
-    private func replacePalyerItem(asset: AVURLAsset) {
+    private func replacePlayerItem(asset: AVURLAsset) {
         guard let player = player else { return }
 
         pause()
@@ -320,6 +329,30 @@ extension SZAVPlayer {
         handlePlayerStatus(status: .loading)
 
         playerItem = AVPlayerItem(asset: asset)
+        if let playerItem = playerItem {
+            addVideoOutput()
+            player.replaceCurrentItem(with: playerItem)
+            addPlayerItemObserver(playerItem: playerItem)
+        }
+    }
+    
+    private func replacePlayerItem(url: URL) {
+        guard let player = player else { return }
+
+        pause()
+        removeVideoOutput()
+
+        if let playerItem = playerItem {
+            if isObserverAdded {
+                removePlayerItemObserver(playerItem: playerItem)
+            }
+
+            self.playerItem = nil
+        }
+
+        handlePlayerStatus(status: .loading)
+
+        playerItem = AVPlayerItem(url: url)
         if let playerItem = playerItem {
             addVideoOutput()
             player.replaceCurrentItem(with: playerItem)
@@ -360,6 +393,7 @@ extension SZAVPlayer {
             }
         case .failed:
             handlePlayerStatus(status: .loadingFailed)
+            print(String(describing: self.player?.currentItem?.error))
         case .unknown:
             break
         @unknown default:
@@ -477,7 +511,6 @@ extension SZAVPlayer {
                                       context: UnsafeMutableRawPointer?)
     {
         guard let playerItem = object as? AVPlayerItem else { return }
-
         switch keyPath {
         case SZPlayerItemStatus:
             handlePlayerItemStatus(playerItem: playerItem)
@@ -644,6 +677,23 @@ extension SZAVPlayer {
         handlePlayerStatus(status: .loading)
 
         playerItem = AVPlayerItem(asset: asset)
+        addVideoOutput()
+        player = AVPlayer(playerItem: playerItem)
+        player?.isMuted = isMuted
+        player?.automaticallyWaitsToMinimizeStalling = false
+
+        if config.isVideo {
+            createPlayerLayer(videoGravity: config.videoGravity)
+        }
+        addPlayerObserver()
+        addPlayerItemObserver(playerItem: playerItem!)
+        addNotificationsForPlayer()
+    }
+    
+    private func createPlayer(url: URL) {
+        handlePlayerStatus(status: .loading)
+
+        playerItem = AVPlayerItem(url: url)
         addVideoOutput()
         player = AVPlayer(playerItem: playerItem)
         player?.isMuted = isMuted
