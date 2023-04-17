@@ -44,11 +44,9 @@ public class SZAVPlayerAssetLoader: NSObject {
         SZLogInfo("deinit")
     }
 
-    public func loadAsset(disableCustomLoading: Bool = false, completion: @escaping (AVURLAsset) -> Void) {
+    public func loadAsset(completion: @escaping (AVURLAsset) -> Void) {
         var asset: AVURLAsset
-        if disableCustomLoading {
-            asset = AVURLAsset(url: url)
-        } else if let urlWithSchema = url.withScheme(SZAVPlayerItemScheme) {
+        if let urlWithSchema = url.withScheme(SZAVPlayerItemScheme) {
             asset = AVURLAsset(url: urlWithSchema)
             asset.resourceLoader.setDelegate(self, queue: loaderQueue)
         } else {

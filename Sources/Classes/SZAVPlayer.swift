@@ -176,7 +176,7 @@ extension SZAVPlayer {
             isReadyToPlay = false
             currentURLStr = config.urlStr
             let assetLoader = createAssetLoader(url: url, uniqueID: config.uniqueID, config: config)
-            assetLoader.loadAsset(disableCustomLoading: config.disableCustomLoading) { (asset) in
+            assetLoader.loadAsset() { (asset) in
                 if let _ = self.player {
                     self.replacePlayerItem(asset: asset)
                 } else {
@@ -394,6 +394,7 @@ extension SZAVPlayer {
         case .failed:
             handlePlayerStatus(status: .loadingFailed)
             print(String(describing: self.player?.currentItem?.error))
+            print("=======")
         case .unknown:
             break
         @unknown default:
@@ -681,6 +682,7 @@ extension SZAVPlayer {
         player = AVPlayer(playerItem: playerItem)
         player?.isMuted = isMuted
         player?.automaticallyWaitsToMinimizeStalling = false
+        
 
         if config.isVideo {
             createPlayerLayer(videoGravity: config.videoGravity)

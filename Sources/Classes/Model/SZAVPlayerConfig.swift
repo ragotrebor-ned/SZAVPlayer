@@ -19,7 +19,6 @@ public struct SZAVPlayerConfig {
 
     /// If set to ture, the asset will be loaded with the system's own way. It is suitable for situations like
     /// local files or you don't needed custom loading.
-    public var disableCustomLoading: Bool = false
     public var useAssetLoader: Bool = true
 
     public var headersForContentInfoRequest: [String: String]?
