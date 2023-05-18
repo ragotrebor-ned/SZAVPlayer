@@ -165,16 +165,14 @@ extension SZAVPlayer {
     ///   - config: The config to setup player properly.
     public func setupPlayer(config: SZAVPlayerConfig) {
         guard let url = URL(string: config.urlStr) else { return }
-
+        self.config = config
+        currentURLStr = config.urlStr
         if config.useAssetLoader {
             if let _ = player, let oldAssetLoader = assetLoader {
                 oldAssetLoader.cleanup()
                 self.assetLoader = nil
             }
-
-            self.config = config
             isReadyToPlay = false
-            currentURLStr = config.urlStr
             let assetLoader = createAssetLoader(url: url, uniqueID: config.uniqueID, config: config)
             assetLoader.loadAsset() { (asset) in
                 if let _ = self.player {
@@ -186,6 +184,7 @@ extension SZAVPlayer {
 
             self.assetLoader = assetLoader
         } else {
+            isReadyToPlay = false
             if let _ = self.player {
                 self.replacePlayerItem(url: url)
             } else {
@@ -393,8 +392,8 @@ extension SZAVPlayer {
             }
         case .failed:
             handlePlayerStatus(status: .loadingFailed)
-            print(String(describing: self.player?.currentItem?.error))
-            print("=======")
+            print("SZAVPlayer_ ", String(describing: self.player?.currentItem?.error))
+            print("SZAVPlayer_ =======")
         case .unknown:
             break
         @unknown default:
